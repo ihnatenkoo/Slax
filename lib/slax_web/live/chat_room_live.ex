@@ -41,48 +41,52 @@ defmodule SlaxWeb.ChatRoomLive do
            <% end %>
          </div>
        </div>
-       <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
-      <%= if @current_user do %>
-        <li class="text-[0.8125rem] leading-6 text-zinc-900">
-          <%= @current_user.email %>
-        </li>
-        <li>
-          <.link
-            href={~p"/users/settings"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Settings
-          </.link>
-        </li>
-        <li>
-          <.link
-            href={~p"/users/log_out"}
-            method="delete"
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Log out
-          </.link>
-        </li>
-      <% else %>
-        <li>
-          <.link
-            href={~p"/users/register"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Register
-          </.link>
-        </li>
-        <li>
-          <.link
-            href={~p"/users/log_in"}
-            class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-          >
-            Log in
-          </.link>
-        </li>
-      <% end %>
-     </ul>
+      <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+        <%= if @current_user do %>
+          <li class="text-[0.8125rem] leading-6 text-zinc-900">
+            <%= @current_user.email %>
+          </li>
+          <li>
+            <.link
+              href={~p"/users/settings"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            >
+              Settings
+            </.link>
+          </li>
+          <li>
+            <.link
+              href={~p"/users/log_out"}
+              method="delete"
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            >
+              Log out
+            </.link>
+          </li>
+        <% else %>
+          <li>
+            <.link
+              href={~p"/users/register"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            >
+              Register
+            </.link>
+          </li>
+          <li>
+            <.link
+              href={~p"/users/log_in"}
+              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+            >
+              Log in
+            </.link>
+          </li>
+        <% end %>
+      </ul>
     </div>
+
+    <section>
+      <.message :for={message <- @messages} message={message}/>
+    </section>
    </div>
    """
   end
@@ -107,6 +111,22 @@ defmodule SlaxWeb.ChatRoomLive do
    """
  end
 
+ defp message(assigns) do
+  ~H"""
+  <div class="relative flex px-4 py-3">
+    <div class="h-10 w-10 rounded flex-shrink-0 bg-slate-300"></div>
+    <div class="ml-2">
+      <div class="-mt-1">
+        <.link class="text-sm font-semibold hover:underline">
+          <span>User</span>
+        </.link>
+        <p class="text-sm"><%= @message.body %></p>
+      </div>
+    </div>
+  </div>
+  """
+ end
+
   def mount(_params, _session, socket) do
     rooms = Chat.list_rooms()
 
@@ -123,9 +143,15 @@ defmodule SlaxWeb.ChatRoomLive do
           Chat.get_first_room!()
       end
 
+    messages = Chat.list_messages_in_room(room)
+
     {:noreply,
       assign(
-        socket, hide_topic?: false, room: room, page_title: "#" <> room.name
+        socket,
+        hide_topic?: false,
+        room: room,
+        messages: messages,
+        page_title: "#" <> room.name
       )
     }
   end
