@@ -17,19 +17,6 @@ defmodule SlaxWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", SlaxWeb do
-    pipe_through :browser
-
-    live "/", ChatRoomLive
-    live "/rooms/:id", ChatRoomLive
-    live "/rooms/:id/edit", ChatRoomLive.Edit
-  end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", SlaxWeb do
-  #   pipe_through :api
-  # end
-
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:slax, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put
@@ -68,6 +55,9 @@ defmodule SlaxWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{SlaxWeb.UserAuth, :ensure_authenticated}] do
+      live "/", ChatRoomLive
+      live "/rooms/:id", ChatRoomLive
+      live "/rooms/:id/edit", ChatRoomLive.Edit
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
