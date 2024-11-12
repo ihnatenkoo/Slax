@@ -19,8 +19,9 @@ defmodule Slax.Chat.Room do
     |> cast(attrs, [:name, :topic])
     |> validate_required([:name])
     |> validate_length(:name, max: 80)
-    |> validate_format(:name,  ~r/\A[a-z0-9-]+\z/,
-      message: "can only contain lowercase letters, numbers and dashes")
+    |> validate_format(:name, ~r/\A[a-z0-9-]+\z/,
+      message: "can only contain lowercase letters, numbers and dashes"
+    )
     |> validate_length(:topic, max: 200)
     |> unsafe_validate_unique(:name, Slax.Repo)
     |> unique_constraint(:name)
@@ -28,6 +29,7 @@ defmodule Slax.Chat.Room do
 end
 
 defmodule Slax.Chat do
+  alias Slax.Accounts.User
   alias Slax.Chat.{Message, Room}
   alias Slax.Repo
 
@@ -48,7 +50,7 @@ defmodule Slax.Chat do
   end
 
   def get_room!(id) do
-   Room |> Repo.get!(id)
+    Room |> Repo.get!(id)
   end
 
   def get_first_room! do
@@ -61,8 +63,8 @@ defmodule Slax.Chat do
 
   def list_messages_in_room(%Room{id: room_id}) do
     from(m in Message,
-    where: m.room_id == ^room_id,
-    order_by: [asc: :inserted_at, asc: :id]
+      where: m.room_id == ^room_id,
+      order_by: [asc: :inserted_at, asc: :id]
     )
     |> preload(:user)
     |> Repo.all()
@@ -72,10 +74,15 @@ defmodule Slax.Chat do
     Message.changeset(message, attrs)
   end
 
-  def create_message(room,attrs, user) do
+  def create_message(room, attrs, user) do
     %Message{room: room, user: user}
     |> Message.changeset(attrs)
     |> Repo.insert()
   end
 
+  def delete_message_by_id(id, %User{id: user_id}) do
+    message = %Message{user_id: ^user_id} = Repo.get(Message, id)
+
+    Repo.delete(message)
+  end
 end
