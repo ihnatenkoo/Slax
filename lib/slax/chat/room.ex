@@ -87,6 +87,17 @@ defmodule Slax.Chat do
     |> Enum.sort_by(& &1.name)
   end
 
+  def list_rooms_with_joined(%User{} = user) do
+    query =
+      from r in Room,
+        left_join: m in RoomMembership,
+        on: r.id == m.room_id and m.user_id == ^user.id,
+        select: {r, not is_nil(m.id)},
+        order_by: [asc: :name]
+
+    Repo.all(query)
+  end
+
   def joined?(%Room{} = room, %User{} = user) do
     Repo.exists?(
       from rm in RoomMembership, where: rm.room_id == ^room.id and rm.user_id == ^user.id
