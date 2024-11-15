@@ -2,11 +2,14 @@ defmodule Slax.Chat.Room do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Slax.Chat.Message
+  alias Slax.Accounts.User
+  alias Slax.Chat.{Message, RoomMembership}
 
   schema "rooms" do
     field :name, :string
     field :topic, :string
+
+    many_to_many :members, User, join_through: RoomMembership
 
     has_many :messages, Message
 
@@ -30,7 +33,7 @@ end
 
 defmodule Slax.Chat do
   alias Slax.Accounts.User
-  alias Slax.Chat.{Message, Room}
+  alias Slax.Chat.{Message, Room, RoomMembership}
   alias Slax.Repo
 
   import Ecto.Query
@@ -51,6 +54,10 @@ defmodule Slax.Chat do
     %Room{}
     |> Room.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def join_room!(room, user) do
+    Repo.insert!(%RoomMembership{room: room, user: user})
   end
 
   def update_room(%Room{} = room, attrs) do
