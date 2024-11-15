@@ -104,6 +104,18 @@ defmodule Slax.Chat do
     )
   end
 
+  def toggle_room_membership(room, user) do
+    case Repo.get_by(RoomMembership, room_id: room.id, user_id: user.id) do
+      %RoomMembership{} = membership ->
+        Repo.delete(membership)
+        {room, false}
+
+      nil ->
+        join_room!(room, user)
+        {room, true}
+    end
+  end
+
   def list_messages_in_room(%Room{id: room_id}) do
     from(m in Message,
       where: m.room_id == ^room_id,
