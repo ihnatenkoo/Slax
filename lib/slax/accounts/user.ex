@@ -8,6 +8,7 @@ defmodule Slax.Accounts.User do
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
+    field :username, :string
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
 

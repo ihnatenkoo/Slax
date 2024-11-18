@@ -95,7 +95,7 @@ defmodule SlaxWeb.ChatRoomLive do
         <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
           <%= if @current_user do %>
             <li class="text-[0.8125rem] leading-6 text-zinc-900">
-              <%= get_username(@current_user) %>
+              <%= @current_user.username %>
             </li>
             <li>
               <.link
@@ -264,7 +264,7 @@ defmodule SlaxWeb.ChatRoomLive do
       <div class="ml-2">
         <div class="-mt-1">
           <.link class="text-sm font-semibold hover:underline">
-            <span><%= get_username(@message.user) %></span>
+            <span><%= @message.user.username %></span>
           </.link>
           <span :if={@timezone} class="ml-1 text-xs text-gray-500">
             <%= message_timestamp(@message, @timezone) %>
@@ -289,7 +289,7 @@ defmodule SlaxWeb.ChatRoomLive do
           <span class="w-2 h-2 rounded-full border-2 border-gray-500"></span>
         <% end %>
       </div>
-      <span class="ml-2 leading-none"><%= get_username(@user) %></span>
+      <span class="ml-2 leading-none"><%= @user.username %></span>
     </.link>
     """
   end
@@ -338,10 +338,6 @@ defmodule SlaxWeb.ChatRoomLive do
     JS.toggle(to: "#users-toggler-chevron-down")
     |> JS.toggle(to: "#users-toggler-chevron-right")
     |> JS.toggle(to: "#users-list")
-  end
-
-  defp get_username(user) do
-    user.email |> String.split("@") |> List.first() |> String.capitalize()
   end
 
   def mount(_params, _session, socket) do
