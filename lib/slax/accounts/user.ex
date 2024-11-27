@@ -11,6 +11,7 @@ defmodule Slax.Accounts.User do
     field :username, :string
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+    field :avatar_path, :string
 
     many_to_many :rooms, Room, join_through: RoomMembership
 
@@ -146,6 +147,11 @@ defmodule Slax.Accounts.User do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
+  end
+
+  def avatar_changeset(user, attrs \\ %{}) do
+    user
+    |> cast(attrs, [:avatar_path])
   end
 
   @doc """
