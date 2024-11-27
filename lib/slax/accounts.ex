@@ -8,6 +8,10 @@ defmodule Slax.Accounts do
 
   alias Slax.Accounts.{User, UserToken, UserNotifier}
 
+  @pubsub Slax.PubSub
+
+  @user_avatar_topic "user-avatars"
+
   ## Database getters
 
   @doc """
@@ -364,8 +368,17 @@ defmodule Slax.Accounts do
   end
 
   def save_user_avatar_path(user, avatar_path) do
-    user
-    |> User.avatar_changeset(%{avatar_path: avatar_path})
-    |> Repo.update()
+    with {:ok, user} <-
+           user
+           |> User.avatar_changeset(%{avatar_path: avatar_path})
+           |> Repo.update() do
+      Phoenix.PubSub.broadcast!(@pubsub, @user_avatar_topic, {:updated_avatar, user})
+
+      {:ok, user}
+    end
+  end
+
+  def subscribe_to_user_avatars do
+    Phoenix.PubSub.subscribe(@pubsub, @user_avatar_topic)
   end
 end
