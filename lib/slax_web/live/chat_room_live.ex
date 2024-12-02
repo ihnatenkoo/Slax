@@ -539,12 +539,6 @@ defmodule SlaxWeb.ChatRoomLive do
     assign(socket, :new_message_form, to_form(changeset))
   end
 
-  defp message_timestamp(message, timezone) do
-    message.inserted_at
-    |> Timex.Timezone.convert(timezone)
-    |> Timex.format!("%-l:%M %p", :strftime)
-  end
-
   defp maybe_insert_unread_marker(messages, nil), do: messages
 
   defp maybe_insert_unread_marker(messages, last_read_id) do
